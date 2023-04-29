@@ -12,7 +12,8 @@
     "test": "mocha -r ts-node/register tests/**/*.spec.ts --exit",
     "lint": "eslint  src/**/*.ts --fix",
     "format": "prettier --write .",
-    "setup-commit": "npx cz-customizable"
+    "setup-commit": "npx cz-customizable",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -45,7 +46,7 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-security": "^1.4.0",
-    "husky": "8.0.3",
+    "husky": "^8.0.0",
     "mocha": "10.2.0",
     "nodemon": "2.0.22",
     "rimraf": "5.0.0",
