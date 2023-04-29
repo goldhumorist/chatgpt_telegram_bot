@@ -1,0 +1,5 @@
+node_modules
+build
+src/tests
+src/db/migrations/*
+src/db/seeds/*

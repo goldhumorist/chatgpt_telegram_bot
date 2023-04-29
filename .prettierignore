@@ -1,0 +1,9 @@
+coverage
+data
+node_modules
+.nyc_output
+*.json
+.eslintrc
+.prettierrc
+tests
+build

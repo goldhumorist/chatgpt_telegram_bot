@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "module": "commonjs",
+    "lib": ["DOM", "ES2016"],
+    "allowJs": true,
+    "checkJs": true,
+    "sourceMap": false,
+    "outDir": "./build",
+    "removeComments": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": false,
+    "baseUrl": "./",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "typeRoots": ["src/@types", "./node_modules/@types"]
+  },
+  "include": ["src", "/test/types/*.test-d.ts", "/types/*.d.ts"],
+  "exclude": ["node_modules"]
+}
