@@ -6,7 +6,7 @@ import { Update, Message } from 'telegraf/typings/core/types/typegram';
  * It may be supplemented
  */
 export type ITelegramContext = NarrowedContext<
-  IBotContexWithSession,
+  IBotContextWithSession,
   {
     message: Update.New &
       Update.NonChannel &
@@ -29,6 +29,6 @@ export interface ISession {
   messages: Array<{ role: ChatRoleEnum; content: string }>;
 }
 
-export interface IBotContexWithSession extends Context {
+export interface IBotContextWithSession extends Context {
   session?: ISession;
 }

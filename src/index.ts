@@ -1,10 +1,10 @@
 import { Telegraf, session } from 'telegraf';
 import { message } from 'telegraf/filters';
 import { config } from './config';
-import { IBotContexWithSession, ITelegramContext } from './interfaces';
+import { IBotContextWithSession, ITelegramContext } from './interfaces';
 import { telegramBotController } from './controllers/telegram-bot.controller';
 
-const BOT = new Telegraf<IBotContexWithSession>(config.TELEGRAM.API_KEY);
+const BOT = new Telegraf<IBotContextWithSession>(config.TELEGRAM.API_KEY);
 
 BOT.use(session());
 

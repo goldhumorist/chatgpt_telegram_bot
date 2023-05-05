@@ -10,6 +10,8 @@ import { ChatRoleEnum } from '../interfaces';
 
 class OpenAiService {
   private openAi: OpenAIApi;
+  private openAiVoiceToTextModel: string = config.OPENAI.VOICE_TO_TEXT_MODEL;
+  private openAiChatModel: string = config.OPENAI.CHAT_MODEL;
 
   constructor() {
     if (!this.openAi) {
@@ -25,7 +27,7 @@ class OpenAiService {
   ): Promise<ChatCompletionResponseMessage> {
     try {
       const response = await this.openAi.createChatCompletion({
-        model: 'gpt-3.5-turbo',
+        model: this.openAiChatModel,
         messages,
       });
 
@@ -39,11 +41,11 @@ class OpenAiService {
     }
   }
 
-  async translateVoiceToText(voiceFilePath: string): Promise<any> {
+  async translateVoiceToText(voiceFilePath: string): Promise<string> {
     try {
       const response = await this.openAi.createTranscription(
         createReadStream(voiceFilePath) as any as File,
-        'whisper-1',
+        this.openAiVoiceToTextModel,
       );
 
       await removeFile(voiceFilePath);
@@ -51,6 +53,8 @@ class OpenAiService {
       return response.data.text;
     } catch (error) {
       console.log('Error during transcription voice to text', error);
+
+      return '';
     }
   }
 }
