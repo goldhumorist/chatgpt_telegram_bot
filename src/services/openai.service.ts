@@ -1,3 +1,4 @@
+import { IMessage } from './../interfaces';
 import {
   ChatCompletionResponseMessage,
   Configuration,
@@ -6,7 +7,6 @@ import {
 import { createReadStream } from 'fs';
 import { config } from '../config';
 import { removeFile } from '../helpers/delete-file.helper';
-import { ChatRoleEnum } from '../interfaces';
 import { loggerFactory } from './../helpers/logger.helper';
 const logger = loggerFactory.getLogger(__filename);
 
@@ -25,39 +25,27 @@ class OpenAiService {
   }
 
   async getResponseFromChatGPT(
-    messages: Array<{ role: ChatRoleEnum; content: string }>,
+    messages: Array<IMessage>,
   ): Promise<ChatCompletionResponseMessage> {
-    try {
-      const response = await this.openAi.createChatCompletion({
-        model: this.openAiChatModel,
-        messages,
-      });
+    const response = await this.openAi.createChatCompletion({
+      model: this.openAiChatModel,
+      messages,
+    });
 
-      return response.data.choices[0].message as ChatCompletionResponseMessage;
-    } catch (error) {
-      logger.error('Error during request to ChatGPT', error);
-
-      return {
-        content: 'Something went wrong',
-      } as ChatCompletionResponseMessage;
-    }
+    return (response?.data?.choices[0]?.message || {
+      content: 'Something went wrong',
+    }) as ChatCompletionResponseMessage;
   }
 
-  async translateVoiceToText(voiceFilePath: string): Promise<string> {
-    try {
-      const response = await this.openAi.createTranscription(
-        createReadStream(voiceFilePath) as any as File,
-        this.openAiVoiceToTextModel,
-      );
+  async translateVoiceMp3ToText(voiceFilePath: string): Promise<string> {
+    const response = await this.openAi.createTranscription(
+      createReadStream(voiceFilePath) as any as File,
+      this.openAiVoiceToTextModel,
+    );
 
-      await removeFile(voiceFilePath);
+    await removeFile(voiceFilePath);
 
-      return response.data.text;
-    } catch (error) {
-      logger.error('Error during transcription voice to text', error);
-
-      return '';
-    }
+    return response?.data?.text || '';
   }
 }
 

@@ -15,18 +15,21 @@ export type ITelegramContext = NarrowedContext<
     update_id: number;
   }
 >;
+export interface IMessage {
+  role: ChatRoleEnum;
+  content: string;
+}
 
 export interface IInitialSession {
-  messages: Array<{ role: ChatRoleEnum; content: string }>;
+  messages: Array<IMessage>;
 }
 export enum ChatRoleEnum {
   system = 'system',
   user = 'user',
   assistant = 'assistant',
 }
-
 export interface ISession {
-  messages: Array<{ role: ChatRoleEnum; content: string }>;
+  messages: Array<IMessage>;
 }
 
 export interface IBotContextWithSession extends Context {

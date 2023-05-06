@@ -11,19 +11,7 @@ const stream = pretty({
   singleLine: true,
 });
 
-export const pinoForLogger = pino(
-  {
-    enabled: config.nodeEnv !== 'test',
-    serializers: {
-      err: e => ({
-        type: e.type,
-        message: e.message,
-        stack: e.stack,
-      }),
-    },
-  },
-  stream,
-);
+export const pinoForLogger = pino({}, stream);
 
 class Logger {
   private _logger: pino.Logger;
@@ -49,8 +37,8 @@ class Logger {
   debug(message: string, ...args: any) {
     return this._logger.debug(args, message);
   }
-  error(message: string, ...args: any) {
-    return this._logger.error(args, message);
+  error(message: string, error: any) {
+    this._logger.error(error, message);
   }
 }
 

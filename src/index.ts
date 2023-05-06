@@ -10,15 +10,9 @@ const BOT = new Telegraf<IBotContextWithSession>(config.TELEGRAM.API_KEY);
 
 BOT.use(session());
 
-BOT.use((context, next) => {
-  logger.info('Bot has received message', context.message);
-  logger.info(
-    `Bot session for ${context.message?.from.id} (before)`,
-    context.session,
-  );
-
-  next();
-});
+BOT.use((context, next) =>
+  telegramBotController.loggingMiddleware(context as ITelegramContext, next),
+);
 
 BOT.command('start', context =>
   telegramBotController.initCommand(context as ITelegramContext),
