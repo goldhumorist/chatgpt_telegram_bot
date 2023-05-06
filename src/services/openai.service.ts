@@ -7,6 +7,8 @@ import { createReadStream } from 'fs';
 import { config } from '../config';
 import { removeFile } from '../helpers/delete-file.helper';
 import { ChatRoleEnum } from '../interfaces';
+import { loggerFactory } from './../helpers/logger.helper';
+const logger = loggerFactory.getLogger(__filename);
 
 class OpenAiService {
   private openAi: OpenAIApi;
@@ -33,7 +35,7 @@ class OpenAiService {
 
       return response.data.choices[0].message as ChatCompletionResponseMessage;
     } catch (error) {
-      console.log('Error during request to ChatGPT', error);
+      logger.error('Error during request to ChatGPT', error);
 
       return {
         content: 'Something went wrong',
@@ -52,7 +54,7 @@ class OpenAiService {
 
       return response.data.text;
     } catch (error) {
-      console.log('Error during transcription voice to text', error);
+      logger.error('Error during transcription voice to text', error);
 
       return '';
     }

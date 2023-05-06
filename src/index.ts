@@ -3,17 +3,29 @@ import { message } from 'telegraf/filters';
 import { config } from './config';
 import { IBotContextWithSession, ITelegramContext } from './interfaces';
 import { telegramBotController } from './controllers/telegram-bot.controller';
+import { loggerFactory } from './helpers/logger.helper';
+const logger = loggerFactory.getLogger(__filename);
 
 const BOT = new Telegraf<IBotContextWithSession>(config.TELEGRAM.API_KEY);
 
 BOT.use(session());
 
+BOT.use((context, next) => {
+  logger.info('Bot has received message', context.message);
+  logger.info(
+    `Bot session for ${context.message?.from.id} (before)`,
+    context.session,
+  );
+
+  next();
+});
+
 BOT.command('start', context =>
-  telegramBotController.startCommand(context as ITelegramContext),
+  telegramBotController.initCommand(context as ITelegramContext),
 );
 
 BOT.command('new', context =>
-  telegramBotController.newCommand(context as ITelegramContext),
+  telegramBotController.initCommand(context as ITelegramContext),
 );
 
 BOT.on(message('voice'), context =>
@@ -26,7 +38,7 @@ BOT.on(message('text'), context =>
 
 BOT.launch();
 
-console.log('Process has started', config);
+logger.info('Process has started', config);
 
 process.once('SIGINT', () => BOT.stop('SIGINT'));
 process.once('SIGTERM', () => BOT.stop('SIGTERM'));
@@ -37,7 +49,7 @@ process.on('unhandledRejection', (reason: Error) => {
 });
 
 process.on('uncaughtException', (error: Error) => {
-  console.log('uncaughtException', error);
+  logger.error('uncaughtException', error);
 
   BOT.stop('SIGTERM');
   process.exit(1);

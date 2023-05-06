@@ -4,6 +4,8 @@ import { resolve } from 'path';
 import ffmpeg from 'fluent-ffmpeg';
 import installer from '@ffmpeg-installer/ffmpeg';
 import { removeFile } from '../helpers/delete-file.helper';
+import { loggerFactory } from './../helpers/logger.helper';
+const logger = loggerFactory.getLogger(__filename);
 
 class OggFileService {
   private ffmpegInstance: ffmpeg.FfmpegCommand;
@@ -36,7 +38,7 @@ class OggFileService {
           .run();
       });
     } catch (error) {
-      console.log('Error during converting .Ogg to .MP3', error);
+      logger.error('Error during converting .Ogg to .MP3', error);
 
       return '';
     }
@@ -59,7 +61,7 @@ class OggFileService {
         stream.on('finish', () => resolve(oggFilePath));
       });
     } catch (error) {
-      console.log('Error during downloading .Ogg File', error);
+      logger.error('Error during downloading .Ogg File', error);
       return '';
     }
   }
