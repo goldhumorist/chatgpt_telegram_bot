@@ -1,6 +1,7 @@
+import { ChatRoleEnum } from './../constants';
 import { telegramBotService } from './../services/telegram-bot.service';
 import { code, italic } from 'telegraf/format';
-import { ChatRoleEnum, IInitialSession, ITelegramContext } from '../interfaces';
+import { IInitialSession, ITelegramContext } from '../interfaces';
 import { loggerFactory } from './../helpers/logger.helper';
 const logger = loggerFactory.getLogger(__filename);
 

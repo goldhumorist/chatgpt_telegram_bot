@@ -1,5 +1,6 @@
 import { Context, NarrowedContext } from 'telegraf';
 import { Update, Message } from 'telegraf/typings/core/types/typegram';
+import { ChatRoleEnum } from './constants';
 
 /**
  * The interface for telegram message context has not yet been completed.
@@ -23,11 +24,7 @@ export interface IMessage {
 export interface IInitialSession {
   messages: Array<IMessage>;
 }
-export enum ChatRoleEnum {
-  system = 'system',
-  user = 'user',
-  assistant = 'assistant',
-}
+
 export interface ISession {
   messages: Array<IMessage>;
 }
