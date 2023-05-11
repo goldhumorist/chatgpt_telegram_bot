@@ -1,13 +1,20 @@
+import {
+  IElasticSearchIndexingService,
+  IUserRequestIndex,
+} from '../interfaces';
 import { USER_REQUEST_INDEX } from '../db/elasticsearch/mapping-documents';
 import { ElasticSearch } from '../db/elasticsearch/elasticsearch-connect';
-import { IUserRequestIndex } from '../interfaces';
 
-export class ElasticSearchIndexingService {
-  constructor() {}
-  private elasticSearchClient = ElasticSearch.getInstance();
+export class ElasticSearchIndexingService
+  implements IElasticSearchIndexingService
+{
+  private elasticSearchClient: ElasticSearch;
+  constructor() {
+    this.elasticSearchClient = ElasticSearch.getInstance();
+  }
 
-  async indexUserRequst(userRequest: IUserRequestIndex) {
-    return await this.elasticSearchClient.log<IUserRequestIndex>(
+  async indexUserRequst(userRequest: IUserRequestIndex): Promise<void> {
+    await this.elasticSearchClient.log<IUserRequestIndex>(
       USER_REQUEST_INDEX,
       userRequest,
       {
@@ -17,5 +24,3 @@ export class ElasticSearchIndexingService {
     );
   }
 }
-
-export const elasticSearchIndexingService = new ElasticSearchIndexingService();

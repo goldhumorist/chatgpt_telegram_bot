@@ -36,7 +36,7 @@ export class ElasticSearch {
       .then(() => {
         logger.info('Connected to Elasticsearch was successful!');
       })
-      .catch(error => {
+      .catch((error: Error) => {
         logger.error('Connection to Elasticsearch unavailable', error);
         throw error;
       });

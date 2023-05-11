@@ -1,16 +1,21 @@
 import { Telegraf, session } from 'telegraf';
 import { message } from 'telegraf/filters';
+import { TelegramBotController } from './controllers/telegram-bot.controller';
 import { config } from './config';
 import { IBotContextWithSession, ITelegramContext } from './interfaces';
-import { telegramBotController } from './controllers/telegram-bot.controller';
 import { loggerFactory } from './helpers/logger.helper';
 import { BotCommands, BotMessageType } from './constants';
 import { ElasticSearch } from './db/elasticsearch/elasticsearch-connect';
 import { mappingDocuments } from './db/elasticsearch/mapping-documents';
+import { ElasticSearchIndexingService } from './services/elastic-indexing.service';
 
 const logger = loggerFactory.getLogger(__filename);
 
 const BOT = new Telegraf<IBotContextWithSession>(config.TELEGRAM.API_KEY);
+
+const telegramBotController = new TelegramBotController(
+  new ElasticSearchIndexingService(),
+);
 
 BOT.use(session());
 

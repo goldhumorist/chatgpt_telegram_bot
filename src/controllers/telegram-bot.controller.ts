@@ -1,12 +1,15 @@
 import { code, italic } from 'telegraf/format';
-import { elasticSearchIndexingService } from '../services/elastic-indexing.service';
+import { OpenAiService } from '../services/openai.service';
+import { OggFileService } from '../services/ogg-files.service';
+import { TelegramBotService } from '../services/telegram-bot.service';
 import {
   IUserRequestIndex,
   IInitialSession,
   ITelegramContext,
+  ITelegramBotService,
+  IElasticSearchIndexingService,
 } from '../interfaces';
 import { ChatRoleEnum } from '../constants';
-import { telegramBotService } from '../services/telegram-bot.service';
 import { loggerFactory } from '../helpers/logger.helper';
 
 const logger = loggerFactory.getLogger(__filename);
@@ -15,6 +18,17 @@ export class TelegramBotController {
   private INITIAL_SESSION: IInitialSession = {
     messages: [],
   };
+
+  private telegramBotService: ITelegramBotService;
+
+  constructor(
+    private elasticSearchIndexingService: IElasticSearchIndexingService,
+  ) {
+    this.telegramBotService = new TelegramBotService(
+      new OggFileService(),
+      new OpenAiService(),
+    );
+  }
 
   async initCommand(context: ITelegramContext) {
     try {
@@ -41,7 +55,7 @@ export class TelegramBotController {
         context?.message?.voice?.file_id,
       );
 
-      const text = await telegramBotService.translateVoiceToText(
+      const text = await this.telegramBotService.translateVoiceToText(
         oggFileLink.href,
         String(context.message.from.id),
       );
@@ -52,7 +66,7 @@ export class TelegramBotController {
 
       context.session.messages.push({ role: ChatRoleEnum.user, content: text });
 
-      const response = await telegramBotService.getResponseFromChatGPT(
+      const response = await this.telegramBotService.getResponseFromChatGPT(
         context.session.messages,
       );
 
@@ -68,7 +82,7 @@ export class TelegramBotController {
         responseSendedAt: new Date(),
       };
 
-      await elasticSearchIndexingService.indexUserRequst(userRequestIndex);
+      await this.elasticSearchIndexingService.indexUserRequst(userRequestIndex);
 
       context.session.messages.push({
         role: ChatRoleEnum.assistant,
@@ -92,7 +106,7 @@ export class TelegramBotController {
 
       context.session.messages.push({ role: ChatRoleEnum.user, content: text });
 
-      const response = await telegramBotService.getResponseFromChatGPT(
+      const response = await this.telegramBotService.getResponseFromChatGPT(
         context.session.messages,
       );
 
@@ -108,7 +122,7 @@ export class TelegramBotController {
         responseSendedAt: new Date(),
       };
 
-      await elasticSearchIndexingService.indexUserRequst(userRequestIndex);
+      await this.elasticSearchIndexingService.indexUserRequst(userRequestIndex);
 
       context.session.messages.push({
         role: ChatRoleEnum.assistant,
@@ -121,7 +135,7 @@ export class TelegramBotController {
     }
   }
 
-  async loggingMiddleware(context: ITelegramContext, next: Function) {
+  async loggingMiddleware(context: ITelegramContext, next: () => void) {
     try {
       logger.info('Bot has received message', context.message);
 
@@ -156,5 +170,3 @@ export class TelegramBotController {
     );
   }
 }
-
-export const telegramBotController = new TelegramBotController();

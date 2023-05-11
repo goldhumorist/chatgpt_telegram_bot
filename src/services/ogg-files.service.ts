@@ -3,13 +3,14 @@ import { createWriteStream } from 'fs';
 import { resolve } from 'path';
 import ffmpeg from 'fluent-ffmpeg';
 import installer from '@ffmpeg-installer/ffmpeg';
+import { IOggFileService } from '../interfaces';
 import { removeFile } from '../helpers/delete-file.helper';
 import { getAxiosInstance } from '../helpers/axios.helper';
 import { loggerFactory } from '../helpers/logger.helper';
 
 const logger = loggerFactory.getLogger(__filename);
 
-class OggFileService {
+export class OggFileService implements IOggFileService {
   private ffmpegInstance: ffmpeg.FfmpegCommand;
   private axiosInstance: Axios;
   constructor() {
@@ -62,5 +63,3 @@ class OggFileService {
     });
   }
 }
-
-export const oggFileService = new OggFileService();

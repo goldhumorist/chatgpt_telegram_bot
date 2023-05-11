@@ -1,5 +1,6 @@
 import { Context, NarrowedContext } from 'telegraf';
 import { Update, Message } from 'telegraf/typings/core/types/typegram';
+import { ChatCompletionResponseMessage } from 'openai';
 import { ChatRoleEnum } from './constants';
 
 /**
@@ -43,4 +44,31 @@ export interface IUserRequestIndex {
   response: string;
   questionGotAt: Date;
   responseSendedAt: Date;
+}
+
+export interface ITelegramBotService {
+  translateVoiceToText(
+    oggVoiceFileUrl: string,
+    userId: string,
+  ): Promise<string>;
+
+  getResponseFromChatGPT(messages: Array<IMessage>): Promise<string>;
+}
+
+export interface IOggFileService {
+  convertOggtoMP3(oggFilePath: string, mp3FileName: string): Promise<string>;
+
+  downloadOggFile(url: string, fileName: string): Promise<string>;
+}
+
+export interface IOpenAiService {
+  getResponseFromChatGPT(
+    messages: Array<IMessage>,
+  ): Promise<ChatCompletionResponseMessage>;
+
+  translateVoiceMp3ToText(voiceFilePath: string): Promise<string>;
+}
+
+export interface IElasticSearchIndexingService {
+  indexUserRequst(userRequest: IUserRequestIndex): Promise<void>;
 }
