@@ -1,5 +1,12 @@
-import { IndicesCreateRequest } from '@elastic/elasticsearch/lib/api/types';
-import { Client, HttpConnection } from '@elastic/elasticsearch';
+import {
+  IndicesCreateRequest,
+  IndexRequest,
+} from '@elastic/elasticsearch/lib/api/types';
+import {
+  Client,
+  HttpConnection,
+  TransportRequestOptions,
+} from '@elastic/elasticsearch';
 import { config } from './../../config';
 import { loggerFactory } from './../../helpers/logger.helper';
 const logger = loggerFactory.getLogger(__filename);
@@ -8,7 +15,7 @@ export class ElasticSearch {
   private static instance: ElasticSearch;
   private static client: Client;
 
-  static async getInstance() {
+  static getInstance(): ElasticSearch {
     if (ElasticSearch.instance) return ElasticSearch.instance;
 
     ElasticSearch.client = new Client({
@@ -23,17 +30,19 @@ export class ElasticSearch {
       Connection: HttpConnection,
     });
 
-    try {
-      await ElasticSearch.client.ping();
-      logger.info('Connected to Elasticsearch was successful!');
-    } catch (error) {
-      logger.error('Connection to Elasticsearch unavailable', error);
-      throw error;
-    }
+    ElasticSearch.client
+      .ping()
+      .then(() => {
+        logger.info('Connected to Elasticsearch was successful!');
+      })
+      .catch(error => {
+        logger.error('Connection to Elasticsearch unavailable', error);
+        throw error;
+      });
 
-    this.instance = new ElasticSearch();
+    ElasticSearch.instance = new ElasticSearch();
 
-    return this.instance;
+    return ElasticSearch.instance;
   }
 
   async init(documents: IndicesCreateRequest[]): Promise<void> {
@@ -58,7 +67,23 @@ export class ElasticSearch {
     }
   }
 
-  async isDocumentExists(
+  async log<T>(
+    index: string,
+    payload: T,
+    params?: IndexRequest | IndexRequest,
+    options?: TransportRequestOptions,
+  ): Promise<void> {
+    ElasticSearch.client.index<T>(
+      {
+        index,
+        document: payload,
+        ...params,
+      },
+      options,
+    );
+  }
+
+  private async isDocumentExists(
     document: IndicesCreateRequest,
   ): Promise<{ exists: boolean; document: IndicesCreateRequest }> {
     let index;

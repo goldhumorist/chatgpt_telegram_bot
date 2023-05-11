@@ -32,3 +32,15 @@ export interface ISession {
 export interface IBotContextWithSession extends Context {
   session?: ISession;
 }
+
+export interface IUserRequestIndex {
+  userId: string | number;
+  userName: string;
+  firstName: string;
+  languageCode: string;
+  message_id: number;
+  question: string;
+  response: string;
+  questionGotAt: Date;
+  responseSendedAt: Date;
+}

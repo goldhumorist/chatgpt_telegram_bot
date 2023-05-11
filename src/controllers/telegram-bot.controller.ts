@@ -1,8 +1,10 @@
-import { ChatRoleEnum } from './../constants';
-import { telegramBotService } from './../services/telegram-bot.service';
 import { code, italic } from 'telegraf/format';
-import { IInitialSession, ITelegramContext } from '../interfaces';
-import { loggerFactory } from './../helpers/logger.helper';
+import { elasticSearchIndexingService } from "../services/elastic-indexing.service";
+import { IUserRequestIndex , IInitialSession, ITelegramContext } from "../interfaces";
+import { ChatRoleEnum } from "../constants";
+import { telegramBotService } from "../services/telegram-bot.service";
+import { loggerFactory } from "../helpers/logger.helper";
+
 const logger = loggerFactory.getLogger(__filename);
 
 export class TelegramBotController {
@@ -27,6 +29,8 @@ export class TelegramBotController {
 
   async voiceMesage(context: ITelegramContext) {
     try {
+      const userQuestionDate = new Date();
+
       context.session ??= this.INITIAL_SESSION;
 
       const oggFileLink = await context.telegram.getFileLink(
@@ -48,6 +52,20 @@ export class TelegramBotController {
         context.session.messages,
       );
 
+      const userRequestIndex: IUserRequestIndex = {
+        userId: context.message.from.id,
+        message_id: context.message.message_id,
+        userName: context.message.from.username || '',
+        firstName: context.message.from.first_name,
+        languageCode: context.message.from.language_code || '',
+        question: text || '',
+        response,
+        questionGotAt: userQuestionDate,
+        responseSendedAt: new Date(),
+      };
+
+      await elasticSearchIndexingService.indexUserRequst(userRequestIndex);
+
       context.session.messages.push({
         role: ChatRoleEnum.assistant,
         content: response,
@@ -61,6 +79,7 @@ export class TelegramBotController {
 
   async textMesage(context: ITelegramContext) {
     try {
+      const userQuestionDate = new Date();
       context.session ??= this.INITIAL_SESSION;
 
       const { text } = context.message;
@@ -72,6 +91,20 @@ export class TelegramBotController {
       const response = await telegramBotService.getResponseFromChatGPT(
         context.session.messages,
       );
+
+      const userRequestIndex: IUserRequestIndex = {
+        userId: context.message.from.id,
+        message_id: context.message.message_id,
+        userName: context.message.from.username || '',
+        firstName: context.message.from.first_name,
+        languageCode: context.message.from.language_code || '',
+        question: text || '',
+        response,
+        questionGotAt: userQuestionDate,
+        responseSendedAt: new Date(),
+      };
+
+      await elasticSearchIndexingService.indexUserRequst(userRequestIndex);
 
       context.session.messages.push({
         role: ChatRoleEnum.assistant,

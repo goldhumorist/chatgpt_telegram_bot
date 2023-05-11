@@ -1,8 +1,10 @@
 import { IndicesCreateRequest } from '@elastic/elasticsearch/lib/api/types';
 
+export const USER_REQUEST_INDEX = 'user-request-to-chatgpt';
+
 export const mappingDocuments: IndicesCreateRequest[] = [
   {
-    index: 'user-request-to-chatgpt',
+    index: USER_REQUEST_INDEX,
     mappings: {
       properties: {
         userId: {
@@ -18,6 +20,9 @@ export const mappingDocuments: IndicesCreateRequest[] = [
         },
         languageCode: {
           type: 'text',
+        },
+        message_id: {
+          type: 'integer',
         },
         question: {
           type: 'text',
