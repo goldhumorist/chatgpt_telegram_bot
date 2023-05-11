@@ -1,6 +1,6 @@
-import { USER_REQUEST_INDEX } from "../db/elasticsearch/mapping-documents";
-import { ElasticSearch } from "../db/elasticsearch/elasticsearch-connect";
-import { IUserRequestIndex } from "../interfaces";
+import { USER_REQUEST_INDEX } from '../db/elasticsearch/mapping-documents';
+import { ElasticSearch } from '../db/elasticsearch/elasticsearch-connect';
+import { IUserRequestIndex } from '../interfaces';
 
 export class ElasticSearchIndexingService {
   constructor() {}

@@ -7,8 +7,9 @@ import {
   HttpConnection,
   TransportRequestOptions,
 } from '@elastic/elasticsearch';
-import { config } from './../../config';
-import { loggerFactory } from './../../helpers/logger.helper';
+import { config } from '../../config';
+import { loggerFactory } from '../../helpers/logger.helper';
+
 const logger = loggerFactory.getLogger(__filename);
 
 export class ElasticSearch {
@@ -53,7 +54,7 @@ export class ElasticSearch {
       'Document statuses',
       docStatuses.map(({ document, exists }) => ({
         docName: document.index,
-        exists: exists,
+        exists,
       })),
     );
 

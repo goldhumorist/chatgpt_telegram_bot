@@ -1,7 +1,7 @@
 import path from 'path';
-import { config } from './../config';
 import { pino } from 'pino';
 import pretty from 'pino-pretty';
+import { config } from '../config';
 
 const stream = pretty({
   colorize: true,
@@ -37,6 +37,7 @@ class Logger {
   debug(message: string, ...args: any) {
     return this._logger.debug(args, message);
   }
+
   error(message: string, error: any) {
     this._logger.error(error, message);
   }

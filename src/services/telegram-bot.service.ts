@@ -1,7 +1,8 @@
-import { IMessage } from './../interfaces';
+import { IMessage } from '../interfaces';
 import { openAiService } from './openai.service';
 import { oggFileService } from './ogg-files.service';
-import { loggerFactory } from './../helpers/logger.helper';
+import { loggerFactory } from '../helpers/logger.helper';
+
 const logger = loggerFactory.getLogger(__filename);
 
 export class TelegramBotService {

@@ -4,8 +4,9 @@ import { resolve } from 'path';
 import ffmpeg from 'fluent-ffmpeg';
 import installer from '@ffmpeg-installer/ffmpeg';
 import { removeFile } from '../helpers/delete-file.helper';
-import { getAxiosInstance } from './../helpers/axios.helper';
-import { loggerFactory } from './../helpers/logger.helper';
+import { getAxiosInstance } from '../helpers/axios.helper';
+import { loggerFactory } from '../helpers/logger.helper';
+
 const logger = loggerFactory.getLogger(__filename);
 
 class OggFileService {

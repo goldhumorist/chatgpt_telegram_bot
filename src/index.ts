@@ -7,6 +7,7 @@ import { loggerFactory } from './helpers/logger.helper';
 import { BotCommands, BotMessageType } from './constants';
 import { ElasticSearch } from './db/elasticsearch/elasticsearch-connect';
 import { mappingDocuments } from './db/elasticsearch/mapping-documents';
+
 const logger = loggerFactory.getLogger(__filename);
 
 const BOT = new Telegraf<IBotContextWithSession>(config.TELEGRAM.API_KEY);

@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { loggerFactory } from './logger.helper';
+
 const logger = loggerFactory.getLogger(__filename);
 
 export const getAxiosInstance = (

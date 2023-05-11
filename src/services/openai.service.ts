@@ -1,13 +1,14 @@
-import { IMessage } from './../interfaces';
 import {
   ChatCompletionResponseMessage,
   Configuration,
   OpenAIApi,
 } from 'openai';
 import { createReadStream } from 'fs';
+import { IMessage } from '../interfaces';
 import { config } from '../config';
 import { removeFile } from '../helpers/delete-file.helper';
-import { loggerFactory } from './../helpers/logger.helper';
+import { loggerFactory } from '../helpers/logger.helper';
+
 const logger = loggerFactory.getLogger(__filename);
 
 class OpenAiService {
