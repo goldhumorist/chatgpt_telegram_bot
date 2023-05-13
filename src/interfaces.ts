@@ -22,8 +22,9 @@ export interface IMessage {
   content: string;
 }
 
-export interface IInitialSession {
+export interface ISession {
   messages: Array<IMessage>;
+  sessionExpiresAt: Date | null;
 }
 
 export interface ISession {

@@ -1,10 +1,10 @@
 import { code, italic } from 'telegraf/format';
+import { validateSession } from '../helpers/telegram-session.helper';
 import { OpenAiService } from '../services/openai.service';
 import { OggFileService } from '../services/ogg-files.service';
 import { TelegramBotService } from '../services/telegram-bot.service';
 import {
-  IUserRequestIndex,
-  IInitialSession,
+  ISession,
   ITelegramContext,
   ITelegramBotService,
   IElasticSearchIndexingService,
@@ -15,8 +15,9 @@ import { loggerFactory } from '../helpers/logger.helper';
 const logger = loggerFactory.getLogger(__filename);
 
 export class TelegramBotController {
-  private INITIAL_SESSION: IInitialSession = {
+  private INITIAL_SESSION: ISession = {
     messages: [],
+    sessionExpiresAt: null,
   };
 
   private telegramBotService: ITelegramBotService;
@@ -50,6 +51,9 @@ export class TelegramBotController {
       const requestDate = new Date();
 
       context.session ??= this.INITIAL_SESSION;
+      const { messages, expiresAt } = validateSession(context.session);
+      context.session.messages = messages;
+      context.session.sessionExpiresAt = expiresAt;
 
       const oggFileLink = await context.telegram.getFileLink(
         context?.message?.voice?.file_id,
@@ -97,10 +101,11 @@ export class TelegramBotController {
     try {
       const requestDate = new Date();
       context.session ??= this.INITIAL_SESSION;
+      const { messages, expiresAt } = validateSession(context.session);
+      context.session.messages = messages;
+      context.session.sessionExpiresAt = expiresAt;
 
       const { text: question } = context.message;
-
-      logger.info("User's question - ", question);
 
       context.session.messages.push({
         role: ChatRoleEnum.user,
