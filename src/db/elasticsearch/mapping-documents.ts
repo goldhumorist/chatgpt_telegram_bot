@@ -30,10 +30,10 @@ export const mappingDocuments: IndicesCreateRequest[] = [
         response: {
           type: 'text',
         },
-        questionGotAt: {
+        requestDate: {
           type: 'date',
         },
-        responseSendedAt: {
+        responseDate: {
           type: 'date',
         },
       },
