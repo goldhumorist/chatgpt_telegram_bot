@@ -42,8 +42,8 @@ export interface IUserRequestIndex {
   message_id: number;
   question: string;
   response: string;
-  questionGotAt: Date;
-  responseSendedAt: Date;
+  requestDate: Date;
+  responseDate: Date;
 }
 
 export interface ITelegramBotService {
@@ -70,5 +70,13 @@ export interface IOpenAiService {
 }
 
 export interface IElasticSearchIndexingService {
-  indexUserRequst(userRequest: IUserRequestIndex): Promise<void>;
+  indexUserRequst(
+    telegramContext: ITelegramContext,
+    additionalDataForIndex: {
+      question: string;
+      response: string;
+      requestDate: Date;
+      responseDate: Date;
+    },
+  ): Promise<void>;
 }

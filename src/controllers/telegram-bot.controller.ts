@@ -47,7 +47,7 @@ export class TelegramBotController {
 
   async voiceMesage(context: ITelegramContext) {
     try {
-      const userQuestionDate = new Date();
+      const requestDate = new Date();
 
       context.session ??= this.INITIAL_SESSION;
 
@@ -55,34 +55,25 @@ export class TelegramBotController {
         context?.message?.voice?.file_id,
       );
 
-      const text = await this.telegramBotService.translateVoiceToText(
+      const question = await this.telegramBotService.translateVoiceToText(
         oggFileLink.href,
         String(context.message.from.id),
       );
 
-      logger.info("User's question - ", text);
+      logger.info("User's question - ", question);
 
-      await context.reply(code(`Your message: ${text}`));
+      await context.reply(code(`Your message: ${question}`));
 
-      context.session.messages.push({ role: ChatRoleEnum.user, content: text });
+      context.session.messages.push({
+        role: ChatRoleEnum.user,
+        content: question,
+      });
 
       const response = await this.telegramBotService.getResponseFromChatGPT(
         context.session.messages,
       );
 
-      const userRequestIndex: IUserRequestIndex = {
-        userId: context.message.from.id,
-        message_id: context.message.message_id,
-        userName: context.message.from.username || '',
-        firstName: context.message.from.first_name,
-        languageCode: context.message.from.language_code || '',
-        question: text || '',
-        response,
-        questionGotAt: userQuestionDate,
-        responseSendedAt: new Date(),
-      };
-
-      await this.elasticSearchIndexingService.indexUserRequst(userRequestIndex);
+      const responseDate = new Date();
 
       context.session.messages.push({
         role: ChatRoleEnum.assistant,
@@ -90,6 +81,13 @@ export class TelegramBotController {
       });
 
       await context.reply(response);
+
+      await this.elasticSearchIndexingService.indexUserRequst(context, {
+        question,
+        response,
+        requestDate,
+        responseDate,
+      });
     } catch (error) {
       await this.errorHandle(error as Error, context);
     }
@@ -97,32 +95,23 @@ export class TelegramBotController {
 
   async textMesage(context: ITelegramContext) {
     try {
-      const userQuestionDate = new Date();
+      const requestDate = new Date();
       context.session ??= this.INITIAL_SESSION;
 
-      const { text } = context.message;
+      const { text: question } = context.message;
 
-      logger.info("User's question - ", text);
+      logger.info("User's question - ", question);
 
-      context.session.messages.push({ role: ChatRoleEnum.user, content: text });
+      context.session.messages.push({
+        role: ChatRoleEnum.user,
+        content: question,
+      });
 
       const response = await this.telegramBotService.getResponseFromChatGPT(
         context.session.messages,
       );
 
-      const userRequestIndex: IUserRequestIndex = {
-        userId: context.message.from.id,
-        message_id: context.message.message_id,
-        userName: context.message.from.username || '',
-        firstName: context.message.from.first_name,
-        languageCode: context.message.from.language_code || '',
-        question: text || '',
-        response,
-        questionGotAt: userQuestionDate,
-        responseSendedAt: new Date(),
-      };
-
-      await this.elasticSearchIndexingService.indexUserRequst(userRequestIndex);
+      const responseDate = new Date();
 
       context.session.messages.push({
         role: ChatRoleEnum.assistant,
@@ -130,6 +119,13 @@ export class TelegramBotController {
       });
 
       await context.reply(response);
+
+      await this.elasticSearchIndexingService.indexUserRequst(context, {
+        question,
+        response,
+        requestDate,
+        responseDate,
+      });
     } catch (error) {
       await this.errorHandle(error as Error, context);
     }
