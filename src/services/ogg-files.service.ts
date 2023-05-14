@@ -33,15 +33,16 @@ export class OggFileService implements IOggFileService {
     );
 
     return new Promise((resolve, reject) => {
-      ffmpeg(oggFilePath)
-        .inputOption('-t 30')
-        .output(mp3FilePath)
+      ffmpeg()
+        .input(oggFilePath)
+        .audioQuality(6)
+        .toFormat('mp3')
+        .on('error', error => reject(error))
         .on('end', async () => {
           await removeFile(oggFilePath);
           resolve(mp3FilePath || '');
         })
-        .on('error', error => reject(error))
-        .run();
+        .pipe(createWriteStream(mp3FilePath), { end: true });
     });
   }
 

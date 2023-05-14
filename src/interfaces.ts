@@ -72,7 +72,7 @@ export interface IOpenAiService {
 
 export interface IElasticSearchIndexingService {
   indexUserRequst(
-    telegramContext: ITelegramContext,
+    telegramContext: IMessageFromContext,
     additionalDataForIndex: {
       question: string;
       response: string;
@@ -80,4 +80,12 @@ export interface IElasticSearchIndexingService {
       responseDate: Date;
     },
   ): Promise<void>;
+}
+
+export interface IMessageFromContext {
+  message_id?: number | undefined;
+  id?: number | undefined;
+  username?: string | undefined;
+  first_name?: string | undefined;
+  language_code?: string | undefined;
 }

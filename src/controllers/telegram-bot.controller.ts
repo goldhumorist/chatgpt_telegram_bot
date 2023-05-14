@@ -51,7 +51,7 @@ export class TelegramBotController {
       const requestDate = new Date();
 
       context.session ??= this.INITIAL_SESSION;
-      const { messages, expiresAt } = validateSession(context.session);
+      const { messages, expiresAt } = validateSession({ ...context.session });
       context.session.messages = messages;
       context.session.sessionExpiresAt = expiresAt;
 
@@ -86,12 +86,15 @@ export class TelegramBotController {
 
       await context.reply(response);
 
-      await this.elasticSearchIndexingService.indexUserRequst(context, {
-        question,
-        response,
-        requestDate,
-        responseDate,
-      });
+      await this.elasticSearchIndexingService.indexUserRequst(
+        { ...context.message, ...context.message.from },
+        {
+          question,
+          response,
+          requestDate,
+          responseDate,
+        },
+      );
     } catch (error) {
       await this.errorHandle(error as Error, context);
     }
@@ -101,7 +104,7 @@ export class TelegramBotController {
     try {
       const requestDate = new Date();
       context.session ??= this.INITIAL_SESSION;
-      const { messages, expiresAt } = validateSession(context.session);
+      const { messages, expiresAt } = validateSession({ ...context.session });
       context.session.messages = messages;
       context.session.sessionExpiresAt = expiresAt;
 
@@ -125,12 +128,15 @@ export class TelegramBotController {
 
       await context.reply(response);
 
-      await this.elasticSearchIndexingService.indexUserRequst(context, {
-        question,
-        response,
-        requestDate,
-        responseDate,
-      });
+      await this.elasticSearchIndexingService.indexUserRequst(
+        { ...context.message, ...context.message.from },
+        {
+          question,
+          response,
+          requestDate,
+          responseDate,
+        },
+      );
     } catch (error) {
       await this.errorHandle(error as Error, context);
     }

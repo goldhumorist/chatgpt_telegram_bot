@@ -1,9 +1,10 @@
-import { loggerFactory } from '../helpers/logger.helper';
 import {
+  IMessageFromContext,
   IElasticSearchIndexingService,
   ITelegramContext,
   IUserRequestIndex,
 } from '../interfaces';
+import { loggerFactory } from '../helpers/logger.helper';
 import { USER_REQUEST_INDEX } from '../db/elasticsearch/mapping-documents';
 import { ElasticSearch } from '../db/elasticsearch/elasticsearch-connect';
 
@@ -18,7 +19,7 @@ export class ElasticSearchIndexingService
   }
 
   async indexUserRequst(
-    telegramContext: ITelegramContext,
+    userInfo: IMessageFromContext,
     additionalDataForIndex: {
       question: string;
       response: string;
@@ -30,11 +31,11 @@ export class ElasticSearchIndexingService
       additionalDataForIndex;
 
     const userRequestIndex: IUserRequestIndex = {
-      userId: telegramContext.message.from.id,
-      message_id: telegramContext.message.message_id,
-      userName: telegramContext.message.from.username || '',
-      firstName: telegramContext.message.from.first_name,
-      languageCode: telegramContext.message.from.language_code || '',
+      userId: userInfo.id || -1,
+      message_id: userInfo.message_id || -1,
+      userName: userInfo.username || '',
+      firstName: userInfo.first_name || '',
+      languageCode: userInfo.language_code || '',
       question: question || '',
       response: response || '',
       requestDate,
