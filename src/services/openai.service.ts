@@ -4,7 +4,7 @@ import {
   OpenAIApi,
 } from 'openai';
 import { createReadStream } from 'fs';
-import { IMessage, IOpenAiService } from '../interfaces';
+import { IChatGPTMessagesHistory, IOpenAiService } from '../interfaces';
 import { config } from '../config';
 import { removeFile } from '../helpers/delete-file.helper';
 import { loggerFactory } from '../helpers/logger.helper';
@@ -26,7 +26,7 @@ export class OpenAiService implements IOpenAiService {
   }
 
   async getResponseFromChatGPT(
-    messages: Array<IMessage>,
+    messages: Array<IChatGPTMessagesHistory>,
   ): Promise<ChatCompletionResponseMessage> {
     const response = await this.openAi.createChatCompletion({
       model: this.openAiChatModel,

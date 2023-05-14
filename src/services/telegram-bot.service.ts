@@ -1,5 +1,8 @@
+import { ChatRoleEnum } from '../constants';
 import {
-  IMessage,
+  IIndexingService,
+  IMessageFromContext,
+  IChatGPTMessagesHistory,
   IOggFileService,
   IOpenAiService,
   ITelegramBotService,
@@ -12,9 +15,67 @@ export class TelegramBotService implements ITelegramBotService {
   constructor(
     private oggFileService: IOggFileService,
     private openAiService: IOpenAiService,
+    private indexingService: IIndexingService,
   ) {}
 
-  async translateVoiceToText(
+  async getResponseForTextMessage(
+    chatGPTMessages: Array<IChatGPTMessagesHistory>,
+    messageFromContext: IMessageFromContext,
+    question: string,
+  ): Promise<string> {
+    const requestDate = new Date();
+
+    chatGPTMessages.push({
+      role: ChatRoleEnum.user,
+      content: question,
+    });
+
+    const response = await this.getResponseFromChatGPT(chatGPTMessages);
+
+    const responseDate = new Date();
+
+    await this.indexingService.indexUserRequst(messageFromContext, {
+      question,
+      response,
+      requestDate,
+      responseDate,
+    });
+
+    return response;
+  }
+
+  async getResponseForVoiceMessage(
+    oggVoiceFileUrl: string,
+    chatGPTMessages: Array<IChatGPTMessagesHistory>,
+    messageFromContext: IMessageFromContext,
+  ): Promise<{ response: string; question: string }> {
+    const requestDate = new Date();
+
+    const question = await this.translateVoiceToText(
+      oggVoiceFileUrl,
+      String(messageFromContext.id),
+    );
+
+    chatGPTMessages.push({
+      role: ChatRoleEnum.user,
+      content: question,
+    });
+
+    const response = await this.getResponseFromChatGPT(chatGPTMessages);
+
+    const responseDate = new Date();
+
+    await this.indexingService.indexUserRequst(messageFromContext, {
+      question,
+      response,
+      requestDate,
+      responseDate,
+    });
+
+    return { response, question };
+  }
+
+  private async translateVoiceToText(
     oggVoiceFileUrl: string,
     userId: string,
   ): Promise<string> {
@@ -33,7 +94,9 @@ export class TelegramBotService implements ITelegramBotService {
     return text || '';
   }
 
-  async getResponseFromChatGPT(messages: Array<IMessage>): Promise<string> {
+  private async getResponseFromChatGPT(
+    messages: Array<IChatGPTMessagesHistory>,
+  ): Promise<string> {
     const response = await this.openAiService.getResponseFromChatGPT(messages);
 
     logger.info("User's response - ", response);

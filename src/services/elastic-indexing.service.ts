@@ -1,7 +1,6 @@
 import {
   IMessageFromContext,
-  IElasticSearchIndexingService,
-  ITelegramContext,
+  IIndexingService,
   IUserRequestIndex,
 } from '../interfaces';
 import { loggerFactory } from '../helpers/logger.helper';
@@ -10,9 +9,7 @@ import { ElasticSearch } from '../db/elasticsearch/elasticsearch-connect';
 
 const logger = loggerFactory.getLogger(__filename);
 
-export class ElasticSearchIndexingService
-  implements IElasticSearchIndexingService
-{
+export class ElasticSearchIndexingService implements IIndexingService {
   private elasticSearchClient: ElasticSearch;
   constructor() {
     this.elasticSearchClient = ElasticSearch.getInstance();

@@ -17,18 +17,18 @@ export type ITelegramContext = NarrowedContext<
     update_id: number;
   }
 >;
-export interface IMessage {
+export interface IChatGPTMessagesHistory {
   role: ChatRoleEnum;
   content: string;
 }
 
 export interface ISession {
-  messages: Array<IMessage>;
+  messages: Array<IChatGPTMessagesHistory>;
   sessionExpiresAt: Date | null;
 }
 
 export interface ISession {
-  messages: Array<IMessage>;
+  messages: Array<IChatGPTMessagesHistory>;
 }
 
 export interface IBotContextWithSession extends Context {
@@ -48,12 +48,17 @@ export interface IUserRequestIndex {
 }
 
 export interface ITelegramBotService {
-  translateVoiceToText(
-    oggVoiceFileUrl: string,
-    userId: string,
+  getResponseForTextMessage(
+    chatGPTMessages: Array<IChatGPTMessagesHistory>,
+    messageFromContext: IMessageFromContext,
+    singleQuestion: string,
   ): Promise<string>;
 
-  getResponseFromChatGPT(messages: Array<IMessage>): Promise<string>;
+  getResponseForVoiceMessage(
+    oggVoiceFileUrl: string,
+    chatGPTMessages: Array<IChatGPTMessagesHistory>,
+    messageFromContext: IMessageFromContext,
+  ): Promise<{ response: string; question: string }>;
 }
 
 export interface IOggFileService {
@@ -64,15 +69,15 @@ export interface IOggFileService {
 
 export interface IOpenAiService {
   getResponseFromChatGPT(
-    messages: Array<IMessage>,
+    messages: Array<IChatGPTMessagesHistory>,
   ): Promise<ChatCompletionResponseMessage>;
 
   translateVoiceMp3ToText(voiceFilePath: string): Promise<string>;
 }
 
-export interface IElasticSearchIndexingService {
+export interface IIndexingService {
   indexUserRequst(
-    telegramContext: IMessageFromContext,
+    messageFromContext: IMessageFromContext,
     additionalDataForIndex: {
       question: string;
       response: string;
@@ -83,8 +88,8 @@ export interface IElasticSearchIndexingService {
 }
 
 export interface IMessageFromContext {
-  message_id?: number | undefined;
-  id?: number | undefined;
+  message_id: number;
+  id?: number;
   username?: string | undefined;
   first_name?: string | undefined;
   language_code?: string | undefined;

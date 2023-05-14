@@ -1,14 +1,10 @@
 import { code, italic } from 'telegraf/format';
+import { ElasticSearchIndexingService } from '../services/elastic-indexing.service';
 import { validateSession } from '../helpers/telegram-session.helper';
 import { OpenAiService } from '../services/openai.service';
 import { OggFileService } from '../services/ogg-files.service';
 import { TelegramBotService } from '../services/telegram-bot.service';
-import {
-  ISession,
-  ITelegramContext,
-  ITelegramBotService,
-  IElasticSearchIndexingService,
-} from '../interfaces';
+import { ISession, ITelegramContext, ITelegramBotService } from '../interfaces';
 import { ChatRoleEnum } from '../constants';
 import { loggerFactory } from '../helpers/logger.helper';
 
@@ -22,19 +18,18 @@ export class TelegramBotController {
 
   private telegramBotService: ITelegramBotService;
 
-  constructor(
-    private elasticSearchIndexingService: IElasticSearchIndexingService,
-  ) {
+  constructor() {
     this.telegramBotService = new TelegramBotService(
       new OggFileService(),
       new OpenAiService(),
+      new ElasticSearchIndexingService(),
     );
   }
 
-  async initCommand(context: ITelegramContext) {
+  async handleInitCommands(context: ITelegramContext) {
     try {
-      if (context.session) context.session.messages = [];
-      else context.session = this.INITIAL_SESSION;
+      context.session ??= this.INITIAL_SESSION;
+      context.session.messages = [];
 
       await context.reply(
         code(
@@ -46,97 +41,47 @@ export class TelegramBotController {
     }
   }
 
-  async voiceMesage(context: ITelegramContext) {
+  async handleVoiceMesage(context: ITelegramContext) {
     try {
-      const requestDate = new Date();
-
-      context.session ??= this.INITIAL_SESSION;
-      const { messages, expiresAt } = validateSession({ ...context.session });
-      context.session.messages = messages;
-      context.session.sessionExpiresAt = expiresAt;
+      this.validateSession(context);
 
       const oggFileLink = await context.telegram.getFileLink(
         context?.message?.voice?.file_id,
       );
 
-      const question = await this.telegramBotService.translateVoiceToText(
-        oggFileLink.href,
-        String(context.message.from.id),
-      );
-
-      logger.info("User's question - ", question);
+      const { response, question } =
+        await this.telegramBotService.getResponseForVoiceMessage(
+          oggFileLink.href,
+          [...context.session!.messages],
+          { ...context.message },
+        );
 
       await context.reply(code(`Your message: ${question}`));
 
-      context.session.messages.push({
-        role: ChatRoleEnum.user,
-        content: question,
-      });
-
-      const response = await this.telegramBotService.getResponseFromChatGPT(
-        context.session.messages,
-      );
-
-      const responseDate = new Date();
-
-      context.session.messages.push({
-        role: ChatRoleEnum.assistant,
-        content: response,
-      });
+      this.updateSessionAfterRequest(context, question, response);
 
       await context.reply(response);
-
-      await this.elasticSearchIndexingService.indexUserRequst(
-        { ...context.message, ...context.message.from },
-        {
-          question,
-          response,
-          requestDate,
-          responseDate,
-        },
-      );
     } catch (error) {
       await this.errorHandle(error as Error, context);
     }
   }
 
-  async textMesage(context: ITelegramContext) {
+  async handleTextMesage(context: ITelegramContext) {
     try {
-      const requestDate = new Date();
-      context.session ??= this.INITIAL_SESSION;
-      const { messages, expiresAt } = validateSession({ ...context.session });
-      context.session.messages = messages;
-      context.session.sessionExpiresAt = expiresAt;
+      this.validateSession(context);
 
       const { text: question } = context.message;
 
-      context.session.messages.push({
-        role: ChatRoleEnum.user,
-        content: question,
-      });
-
-      const response = await this.telegramBotService.getResponseFromChatGPT(
-        context.session.messages,
+      const response = await this.telegramBotService.getResponseForTextMessage(
+        [...context.session!.messages],
+        { ...context.message },
+        question,
       );
 
-      const responseDate = new Date();
-
-      context.session.messages.push({
-        role: ChatRoleEnum.assistant,
-        content: response,
-      });
+      this.updateSessionAfterRequest(context, question, response);
 
       await context.reply(response);
-
-      await this.elasticSearchIndexingService.indexUserRequst(
-        { ...context.message, ...context.message.from },
-        {
-          question,
-          response,
-          requestDate,
-          responseDate,
-        },
-      );
+      logger.info('context.session END', context.session);
     } catch (error) {
       await this.errorHandle(error as Error, context);
     }
@@ -165,6 +110,28 @@ export class TelegramBotController {
     } catch (error) {
       await this.errorHandle(error as Error, context);
     }
+  }
+
+  private validateSession(context: ITelegramContext) {
+    context.session ??= this.INITIAL_SESSION;
+    const { messages, expiresAt } = validateSession({ ...context.session });
+    context.session.messages = messages;
+    context.session.sessionExpiresAt = expiresAt;
+  }
+
+  private updateSessionAfterRequest(
+    context: ITelegramContext,
+    question: string,
+    response: string,
+  ) {
+    context.session!.messages.push({
+      role: ChatRoleEnum.user,
+      content: question,
+    });
+    context.session!.messages.push({
+      role: ChatRoleEnum.assistant,
+      content: response,
+    });
   }
 
   private async errorHandle(err: Error, context: ITelegramContext) {

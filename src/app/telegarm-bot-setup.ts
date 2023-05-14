@@ -11,9 +11,7 @@ const logger = loggerFactory.getLogger(__filename);
 
 const BOT = new Telegraf<IBotContextWithSession>(config.TELEGRAM.API_KEY);
 
-const telegramBotController = new TelegramBotController(
-  new ElasticSearchIndexingService(),
-);
+const telegramBotController = new TelegramBotController();
 
 BOT.use(session());
 
@@ -22,19 +20,19 @@ BOT.use((context, next) =>
 );
 
 BOT.command(BotCommands.start, context =>
-  telegramBotController.initCommand(context as ITelegramContext),
+  telegramBotController.handleInitCommands(context as ITelegramContext),
 );
 
 BOT.command(BotCommands.new, context =>
-  telegramBotController.initCommand(context as ITelegramContext),
+  telegramBotController.handleInitCommands(context as ITelegramContext),
 );
 
 BOT.on(message(BotMessageType.voice), context =>
-  telegramBotController.voiceMesage(context as ITelegramContext),
+  telegramBotController.handleVoiceMesage(context as ITelegramContext),
 );
 
 BOT.on(message(BotMessageType.text), context =>
-  telegramBotController.textMesage(context as ITelegramContext),
+  telegramBotController.handleTextMesage(context as ITelegramContext),
 );
 
 export default BOT;
