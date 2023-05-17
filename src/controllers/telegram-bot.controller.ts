@@ -53,12 +53,12 @@ export class TelegramBotController {
         await this.telegramBotService.getResponseForVoiceMessage(
           oggFileLink.href,
           [...context.session!.messages],
-          { ...context.message },
+          { ...context.message.from, message_id: context.message.message_id },
         );
 
       await context.reply(code(`Your message: ${question}`));
 
-      this.updateSessionAfterRequest(context, question, response);
+      this.updateSessionMessagesAfterRequest(context, question, response);
 
       await context.reply(response);
     } catch (error) {
@@ -74,14 +74,13 @@ export class TelegramBotController {
 
       const response = await this.telegramBotService.getResponseForTextMessage(
         [...context.session!.messages],
-        { ...context.message },
+        { ...context.message.from, message_id: context.message.message_id },
         question,
       );
 
-      this.updateSessionAfterRequest(context, question, response);
+      this.updateSessionMessagesAfterRequest(context, question, response);
 
       await context.reply(response);
-      logger.info('context.session END', context.session);
     } catch (error) {
       await this.errorHandle(error as Error, context);
     }
@@ -119,7 +118,7 @@ export class TelegramBotController {
     context.session.sessionExpiresAt = expiresAt;
   }
 
-  private updateSessionAfterRequest(
+  private updateSessionMessagesAfterRequest(
     context: ITelegramContext,
     question: string,
     response: string,
