@@ -13,6 +13,7 @@ import { loggerFactory } from '../../helpers/logger.helper';
 const logger = loggerFactory.getLogger(__filename);
 
 export class ElasticSearch {
+  /* eslint-disable no-use-before-define */
   private static instance: ElasticSearch;
   private static client: Client;
 
@@ -52,18 +53,28 @@ export class ElasticSearch {
 
     logger.info(
       'Document statuses',
-      docStatuses.map(({ document, exists }) => ({
-        docName: document.index,
-        exists,
-      })),
+      docStatuses.map(
+        (docStatuses: { document: IndicesCreateRequest; exists: boolean }) => {
+          const { document, exists } = docStatuses;
+          return {
+            docName: document.index,
+            exists,
+          };
+        },
+      ),
     );
 
-    const notExistingDocuments = docStatuses.filter(({ exists }) => !exists);
+    const notExistingDocuments = docStatuses.filter(
+      (docStatuses: { exists: boolean }) => !docStatuses.exists,
+    );
 
     if (notExistingDocuments.length) {
       logger.info('Create new documents');
       await this.createDocuments(
-        notExistingDocuments.map(({ document }) => document),
+        notExistingDocuments.map(
+          (docStatuses: { document: IndicesCreateRequest }) =>
+            docStatuses.document,
+        ),
       );
     }
   }

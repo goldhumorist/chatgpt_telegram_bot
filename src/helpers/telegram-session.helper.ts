@@ -8,7 +8,7 @@ export const validateSession = (session: ISession) => {
     new Date().getTime() + EXPIRES_AT_SESSION_DEFAULT,
   );
 
-  const isSessionExpired = new Date() > session?.sessionExpiresAt!;
+  const isSessionExpired = new Date() > session.sessionExpiresAt!;
 
   if (!session?.sessionExpiresAt || isSessionExpired) {
     return {

@@ -3,6 +3,19 @@ import { Update, Message } from 'telegraf/typings/core/types/typegram';
 import { ChatCompletionResponseMessage } from 'openai';
 import { ChatRoleEnum } from './constants';
 
+export interface IChatGPTMessagesHistory {
+  role: ChatRoleEnum;
+  content: string;
+}
+export interface ISession {
+  messages: Array<IChatGPTMessagesHistory>;
+  sessionExpiresAt: Date | null;
+}
+
+export interface IBotContextWithSession extends Context {
+  session?: ISession;
+}
+
 /**
  * The interface for telegram message context has not yet been completed.
  * It may be supplemented
@@ -17,23 +30,6 @@ export type ITelegramContext = NarrowedContext<
     update_id: number;
   }
 >;
-export interface IChatGPTMessagesHistory {
-  role: ChatRoleEnum;
-  content: string;
-}
-
-export interface ISession {
-  messages: Array<IChatGPTMessagesHistory>;
-  sessionExpiresAt: Date | null;
-}
-
-export interface ISession {
-  messages: Array<IChatGPTMessagesHistory>;
-}
-
-export interface IBotContextWithSession extends Context {
-  session?: ISession;
-}
 
 export interface IUserRequestIndex {
   userId: string | number;
@@ -45,6 +41,14 @@ export interface IUserRequestIndex {
   response: string;
   requestDate: Date;
   responseDate: Date;
+}
+
+export interface IMessageFromContext {
+  message_id: number;
+  id?: number;
+  username?: string | undefined;
+  first_name?: string | undefined;
+  language_code?: string | undefined;
 }
 
 export interface ITelegramBotService {
@@ -85,12 +89,4 @@ export interface IIndexingService {
       responseDate: Date;
     },
   ): Promise<void>;
-}
-
-export interface IMessageFromContext {
-  message_id: number;
-  id?: number;
-  username?: string | undefined;
-  first_name?: string | undefined;
-  language_code?: string | undefined;
 }

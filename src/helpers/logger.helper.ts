@@ -1,11 +1,11 @@
 import path from 'path';
 import { pino } from 'pino';
 import pretty from 'pino-pretty';
-import { config } from '../config';
 
 const stream = pretty({
   colorize: true,
   customPrettifiers: {
+    /* eslint-disable @typescript-eslint/typedef */
     caller: caller => `${caller}`,
   },
   singleLine: true,

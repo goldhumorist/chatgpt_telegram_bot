@@ -15,7 +15,7 @@ BOT.telegram
     const elasticSearchInstance = await ElasticSearch.getInstance();
     await elasticSearchInstance.init(mappingDocuments);
   })
-  .catch(error => {
+  .catch((error: Error) => {
     logger.error('Error during launch the bot', error);
     throw error;
   });

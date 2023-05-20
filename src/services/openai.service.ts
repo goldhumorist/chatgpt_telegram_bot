@@ -7,9 +7,6 @@ import { createReadStream } from 'fs';
 import { IChatGPTMessagesHistory, IOpenAiService } from '../interfaces';
 import { config } from '../config';
 import { removeFile } from '../helpers/delete-file.helper';
-import { loggerFactory } from '../helpers/logger.helper';
-
-const logger = loggerFactory.getLogger(__filename);
 
 export class OpenAiService implements IOpenAiService {
   private openAi: OpenAIApi;
@@ -40,6 +37,7 @@ export class OpenAiService implements IOpenAiService {
 
   async translateVoiceMp3ToText(voiceFilePath: string): Promise<string> {
     const response = await this.openAi.createTranscription(
+      /* eslint-disable-next-line security/detect-non-literal-fs-filename */
       createReadStream(voiceFilePath) as any as File,
       this.openAiVoiceToTextModel,
     );

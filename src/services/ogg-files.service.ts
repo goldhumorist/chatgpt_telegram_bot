@@ -6,9 +6,6 @@ import installer from '@ffmpeg-installer/ffmpeg';
 import { IOggFileService } from '../interfaces';
 import { removeFile } from '../helpers/delete-file.helper';
 import { getAxiosInstance } from '../helpers/axios.helper';
-import { loggerFactory } from '../helpers/logger.helper';
-
-const logger = loggerFactory.getLogger(__filename);
 
 export class OggFileService implements IOggFileService {
   private ffmpegInstance: ffmpeg.FfmpegCommand;
@@ -32,6 +29,7 @@ export class OggFileService implements IOggFileService {
       `${mp3FileName}.mp3`,
     );
 
+    /* eslint-disable @typescript-eslint/typedef */
     return new Promise((resolve, reject) => {
       ffmpeg()
         .input(oggFilePath)
@@ -42,6 +40,7 @@ export class OggFileService implements IOggFileService {
           await removeFile(oggFilePath);
           resolve(mp3FilePath || '');
         })
+        /* eslint-disable-next-line security/detect-non-literal-fs-filename */
         .pipe(createWriteStream(mp3FilePath), { end: true });
     });
   }
@@ -54,7 +53,9 @@ export class OggFileService implements IOggFileService {
       responseType: 'stream',
     });
 
+    /* eslint-disable @typescript-eslint/typedef */
     return new Promise((resolve, reject) => {
+      /* eslint-disable-next-line security/detect-non-literal-fs-filename */
       const stream = createWriteStream(oggFilePath);
 
       response.data.pipe(stream);

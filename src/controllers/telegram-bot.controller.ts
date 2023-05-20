@@ -52,7 +52,7 @@ export class TelegramBotController {
       const { response, question } =
         await this.telegramBotService.getResponseForVoiceMessage(
           oggFileLink.href,
-          [...context.session!.messages],
+          [...(context.session?.messages || [])],
           { ...context.message.from, message_id: context.message.message_id },
         );
 
@@ -73,7 +73,7 @@ export class TelegramBotController {
       const { text: question } = context.message;
 
       const response = await this.telegramBotService.getResponseForTextMessage(
-        [...context.session!.messages],
+        [...(context.session?.messages || [])],
         { ...context.message.from, message_id: context.message.message_id },
         question,
       );
@@ -101,7 +101,7 @@ export class TelegramBotController {
       }
 
       logger.info(
-        `Bot session for ${context.message?.from.id} (before)`,
+        `Bot session for ${context.message?.from?.id} (before)`,
         context.session,
       );
 
@@ -123,11 +123,11 @@ export class TelegramBotController {
     question: string,
     response: string,
   ) {
-    context.session!.messages.push({
+    context.session?.messages?.push({
       role: ChatRoleEnum.user,
       content: question,
     });
-    context.session!.messages.push({
+    context.session?.messages?.push({
       role: ChatRoleEnum.assistant,
       content: response,
     });
