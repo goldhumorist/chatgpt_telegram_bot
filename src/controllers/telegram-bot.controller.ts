@@ -53,7 +53,7 @@ export class TelegramBotController {
         await this.telegramBotService.getResponseForVoiceMessage(
           oggFileLink.href,
           [...(context.session?.messages || [])],
-          { ...context.message.from, message_id: context.message.message_id },
+          { ...context.message.from, messageId: context.message.message_id },
         );
 
       await context.reply(code(`Your message: ${question}`));
@@ -74,7 +74,7 @@ export class TelegramBotController {
 
       const response = await this.telegramBotService.getResponseForTextMessage(
         [...(context.session?.messages || [])],
-        { ...context.message.from, message_id: context.message.message_id },
+        { ...context.message.from, messageId: context.message.message_id },
         question,
       );
 

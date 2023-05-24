@@ -21,7 +21,7 @@ export const mappingDocuments: IndicesCreateRequest[] = [
         languageCode: {
           type: 'text',
         },
-        message_id: {
+        messageId: {
           type: 'integer',
         },
         question: {

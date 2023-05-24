@@ -36,7 +36,7 @@ export interface IUserRequestIndex {
   userName: string;
   firstName: string;
   languageCode: string;
-  message_id: number;
+  messageId: number;
   question: string;
   response: string;
   requestDate: Date;
@@ -44,7 +44,7 @@ export interface IUserRequestIndex {
 }
 
 export interface IMessageFromContext {
-  message_id: number;
+  messageId: number;
   id?: number;
   username?: string | undefined;
   first_name?: string | undefined;

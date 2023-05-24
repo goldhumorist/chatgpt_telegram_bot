@@ -29,7 +29,7 @@ export class ElasticSearchIndexingService implements IIndexingService {
 
     const userRequestIndex: IUserRequestIndex = {
       userId: userInfo.id || -1,
-      message_id: userInfo.message_id || -1,
+      messageId: userInfo.messageId || -1,
       userName: userInfo.username || '',
       firstName: userInfo.first_name || '',
       languageCode: userInfo.language_code || '',
@@ -44,7 +44,7 @@ export class ElasticSearchIndexingService implements IIndexingService {
       userRequestIndex,
       {
         index: USER_REQUEST_INDEX,
-        id: `user:${userRequestIndex.userName}_${userRequestIndex.message_id}`,
+        id: `user:${userRequestIndex.userName}_${userRequestIndex.messageId}`,
       },
     );
 
